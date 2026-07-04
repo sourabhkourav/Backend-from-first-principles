@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTP for Backend Engineers — Interactive Self-Test Q&A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-gradient: radial-gradient(circle at top left, #0d111a, #07090e);
+    --bg: #07090e;
+    --card-bg: rgba(18, 24, 38, 0.6);
+    --card-hover: rgba(26, 34, 54, 0.8);
+    --answer-bg: rgba(11, 15, 24, 0.9);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(122, 162, 247, 0.3);
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent: #7aa2f7;
+    --accent-glow: rgba(122, 162, 247, 0.15);
+    --accent-dark: #5a7fd0;
+    --success: #9ece6a;
+    --success-glow: rgba(158, 206, 106, 0.15);
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    background-image: var(--bg-gradient);
+    color: var(--text);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    padding: 40px 20px 100px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 40px;
+  }
+
+  @media (max-width: 900px) {
+    .container {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .sidebar {
+      position: relative !important;
+      top: 0 !important;
+      max-height: none !important;
+    }
+  }
+
+  /* Header */
+  header {
+    grid-column: 1 / -1;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    position: relative;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(122, 162, 247, 0.3);
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .sub a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .sub a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  /* Sidebar Navigation */
+  .sidebar {
+    position: sticky;
+    top: 40px;
+    max-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .nav-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+
+  .nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .nav-item button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-item button:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .nav-item.active button {
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .nav-item .sec-count {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* Progress Box */
+  .progress-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-container {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* Main Content Area */
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Search & Controls Toolbar */
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+  }
+
+  .search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+  }
+
+  .search-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    padding: 10px 16px 10px 40px;
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .btn {
+    background: var(--accent);
+    color: #07090e;
+    border: none;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--text-muted);
+  }
+
+  .stats-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-left: auto;
+    font-weight: 600;
+  }
+
+  /* Section Title */
+  .section-group {
+    margin-bottom: 30px;
+    scroll-margin-top: 110px; /* Offset for sticky nav headers */
+  }
+
+  .section-title {
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 32px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(122, 162, 247, 0.2), transparent);
+  }
+
+  /* Q&A Cards */
+  .qcard {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(10px);
+  }
+
+  .qcard:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  }
+
+  .qcard.open {
+    border-color: rgba(122, 162, 247, 0.4);
+    box-shadow: 0 0 15px var(--accent-glow);
+  }
+
+  .qhead {
+    padding: 18px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    user-select: none;
+  }
+
+  .qhead-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    flex: 1;
+  }
+
+  .qnum {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 0.9rem;
+    background: var(--accent-glow);
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .qtext {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.45;
+  }
+
+  /* Checkbox and Icons */
+  .actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .mastered-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .mastered-badge:hover {
+    border-color: var(--success);
+    background: var(--success-glow);
+  }
+
+  .mastered-badge svg {
+    width: 14px;
+    height: 14px;
+    color: transparent;
+    transition: all 0.2s;
+  }
+
+  .qcard.mastered {
+    border-color: rgba(158, 206, 106, 0.3);
+  }
+
+  .qcard.mastered .mastered-badge {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  .qcard.mastered .mastered-badge svg {
+    color: #07090e;
+  }
+
+  .chevron {
+    color: var(--text-muted);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qcard.open .chevron {
+    transform: rotate(90deg);
+    color: var(--accent);
+  }
+
+  /* Answer Section */
+  .answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease-in-out;
+    background: var(--answer-bg);
+  }
+
+  .qcard.open .answer {
+    grid-template-rows: 1fr;
+    border-top: 1px solid var(--border);
+  }
+
+  .answer-inner {
+    overflow: hidden;
+    padding: 0 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    transition: padding 0.3s ease-in-out;
+  }
+
+  .qcard.open .answer-inner {
+    padding: 20px;
+    color: var(--text);
+  }
+
+  code {
+    background: #1e293b;
+    color: #cbd5e1;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-family: var(--font-mono);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Highlight Matching Search Terms */
+  .highlight {
+    background: rgba(245, 158, 11, 0.3);
+    color: #fff;
+    padding: 0 2px;
+    border-radius: 3px;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--card-bg);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    color: var(--text-muted);
+    display: none;
+  }
+
+  .empty-state svg {
+    width: 48px;
+    height: 48px;
+    stroke-width: 1.5;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge">Video 5 Self-Test</div>
+    <h1>Understanding HTTP</h1>
+    <div class="sub">
+      Based on the article and video <a href="https://srinivas.co/understanding-http-for-backend-engineers/" target="_blank" rel="noopener noreferrer">"Understanding HTTP for backend engineers, where it all starts"</a> from the playlist <a href="https://youtube.com/playlist?list=PLui3EUkuMTPgZcV0QhQrOcwMPcBCcd_Q1" target="_blank" rel="noopener noreferrer">"Backend from first principles"</a> by Sriniously.
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="progress-box">
+      <div class="progress-info">
+        <span>YOUR PROGRESS</span>
+        <span id="progressPercent">0%</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-desc">
+        Check the square box <span style="display:inline-flex; vertical-align:middle; width:12px; height:12px; border:1px solid var(--text-muted); border-radius:3px; margin: 0 2px;"></span> next to questions you have fully mastered to track your learning journey. Saved automatically.
+      </div>
+    </div>
+
+    <div class="nav-box">
+      <div class="nav-title">Categories</div>
+      <ul class="nav-list" id="categoryNav">
+        <!-- Navigation links generated dynamically -->
+      </ul>
+    </div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search questions or keywords...">
+      </div>
+      <button class="btn btn-outline" id="toggleAllBtn">
+        Show All Answers
+      </button>
+      <button class="btn btn-outline" id="resetProgressBtn" style="font-size:0.8rem; padding:10px 14px;">
+        Reset Progress
+      </button>
+      <span class="stats-label" id="countLabel">0 questions</span>
+    </div>
+
+    <div id="questionsContainer">
+      <!-- Questions generated dynamically -->
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <p>No questions matched your search query. Try another search!</p>
+    </div>
+  </main>
+</div>
+
+<script>
+const data = [
+  { section: "HTTP Basics & Evolution", items: [
+    ["What is HTTP, and why is it stateless?", "HTTP (HyperText Transfer Protocol) is an application-layer protocol for exchanging data between client and server, built on request-response semantics. It's stateless because each request is independent — the server doesn't retain any memory of previous requests unless state is added externally (cookies, sessions, tokens)."],
+    ["Key differences between HTTP/1.0, 1.1, 2, and 3?", "HTTP/1.0: one request per TCP connection (connection closes after response).<br>HTTP/1.1: introduced persistent connections (keep-alive), pipelining, chunked transfer encoding, host header (virtual hosting).<br>HTTP/2: binary framing, multiplexing (multiple requests over one connection), header compression (HPACK), server push.<br>HTTP/3: runs over QUIC (UDP-based) instead of TCP, eliminating TCP-level head-of-line blocking, faster handshakes."],
+    ["What problem does HTTP/2 multiplexing solve?", "In HTTP/1.1, only one request could be outstanding per TCP connection at a time (or required multiple connections to parallelize). Multiplexing lets multiple request/response streams share a single connection concurrently, removing application-layer head-of-line blocking."],
+    ["What is head-of-line blocking, and how does HTTP/3 fix it?", "It's when one slow/stuck request blocks others behind it from being processed, because they share the same connection/stream. HTTP/2 fixed it at the application layer but still suffered at the TCP layer (a lost packet stalls all streams). HTTP/3 uses QUIC (UDP), where streams are independent, so packet loss on one stream doesn't block others."]
+  ]},
+  { section: "HTTP Messages & Headers", items: [
+    ["Components of an HTTP request/response?", "Request: method, path/URL, HTTP version, headers, optional body.<br>Response: HTTP version, status code + reason phrase, headers, optional body."],
+    ["Why do we need HTTP headers?", "They carry metadata about the request/response (content type, caching rules, auth tokens, encoding) that the body alone can't express — enabling content negotiation, security, and caching without changing the payload."],
+    ["Categories of HTTP headers?", "General headers (apply to both request and response, e.g. <code>Connection</code>, <code>Date</code>)<br>Request headers (e.g. <code>Host</code>, <code>Authorization</code>, <code>Accept</code>)<br>Response headers (e.g. <code>Set-Cookie</code>, <code>Server</code>)<br>Entity/representation headers (describe the body, e.g. <code>Content-Type</code>, <code>Content-Length</code>)"],
+    ["Common headers and their purpose?", "<code>Content-Type</code>: media type of the body (e.g. application/json)<br><code>Authorization</code>: credentials for auth (Bearer token, Basic auth)<br><code>Cache-Control</code>: caching directives (no-cache, max-age)<br><code>ETag</code>: version identifier for a resource, used in cache validation"]
+  ]},
+  { section: "HTTP Methods", items: [
+    ["Standard HTTP methods and their use?", "GET: retrieve a resource<br>POST: create a resource / submit data<br>PUT: replace a resource entirely<br>PATCH: partially update a resource<br>DELETE: remove a resource<br>HEAD: like GET but no body, just headers<br>OPTIONS: discover allowed methods/CORS capabilities"],
+    ["What is idempotency? Which methods are idempotent?", "An idempotent operation produces the same result no matter how many times it's repeated. GET, PUT, DELETE, HEAD, OPTIONS are idempotent. POST and PATCH are generally not."],
+    ["Is POST idempotent?", "No — calling POST multiple times typically creates multiple resources (e.g., submitting a payment twice creates two charges), unless the API explicitly adds idempotency keys to make it safe."],
+    ["Purpose of the OPTIONS method?", "Used to ask the server what methods/headers are allowed on a resource, without side effects — the browser uses it automatically as a CORS preflight check."]
+  ]},
+  { section: "CORS", items: [
+    ["What is CORS and why does the browser enforce it?", "Cross-Origin Resource Sharing is a browser security mechanism that restricts web pages from making requests to a different origin (domain/port/protocol) than the one that served them, unless the server explicitly allows it — protecting users from malicious cross-site requests."],
+    ["Walk through the CORS preflight workflow.", "For \"non-simple\" requests (custom headers, methods like PUT/DELETE, or non-standard content types), the browser first sends an OPTIONS request to check if the actual request is allowed. If the server responds with the right Access-Control-Allow-* headers, the browser proceeds with the actual request."],
+    ["Headers involved in CORS?", "<code>Access-Control-Allow-Origin</code>, <code>Access-Control-Allow-Methods</code>, <code>Access-Control-Allow-Headers</code>, <code>Access-Control-Allow-Credentials</code>, <code>Origin</code> (sent by browser)."],
+    ["How would you debug CORS using Burp Suite?", "Intercept the OPTIONS preflight and actual request/response, inspect whether the server's Access-Control-Allow-* headers match the requesting origin/method/headers, and check for missing or mismatched values causing the browser to block the response."]
+  ]},
+  { section: "Status Codes", items: [
+    ["Five classes of status codes?", "1xx: Informational<br>2xx: Success<br>3xx: Redirection<br>4xx: Client error<br>5xx: Server error"],
+    ["401 vs 403?", "401 Unauthorized: not authenticated (missing/invalid credentials). 403 Forbidden: authenticated, but not authorized to access the resource."],
+    ["301 vs 302?", "301: permanent redirect (clients/search engines should update to the new URL). 302: temporary redirect (keep using the original URL for future requests)."],
+    ["429 vs 503?", "429: client is rate-limited (too many requests). 503: server unavailable (overloaded/down for maintenance), unrelated to the specific client's request rate."]
+  ]},
+  { section: "Caching", items: [
+    ["How does HTTP caching work?", "Cache-Control sets caching rules (e.g., max-age, no-cache, private/public). ETag and Last-Modified allow validation — the client sends If-None-Match/If-Modified-Since on revalidation, and the server returns 304 Not Modified if nothing changed, avoiding a full re-download."],
+    ["Strong vs weak validator?", "ETag is a strong validator — byte-for-byte comparison. Last-Modified is a weak validator based on timestamp granularity (seconds), less precise."],
+    ["Browser cache vs proxy cache vs CDN cache?", "Browser cache: stored locally on the user's device. Proxy cache: shared cache between client and origin (e.g., corporate proxy). CDN cache: geographically distributed edge caches that serve content closer to users, reducing origin load and latency."]
+  ]},
+  { section: "Content Negotiation & Compression", items: [
+    ["What is content negotiation?", "The mechanism by which client and server agree on the best representation of a resource — format, language, encoding — using headers like Accept (media type), Accept-Language, Accept-Encoding, with the server responding via Content-Type, Content-Language, Content-Encoding."],
+    ["How does HTTP compression work?", "The client advertises supported encodings via Accept-Encoding (e.g., gzip, br). The server compresses the response body and sets Content-Encoding accordingly, reducing payload size and transfer time — usually configured at the web server/reverse proxy level (Nginx, etc.)."]
+  ]},
+  { section: "Connections", items: [
+    ["What is a persistent connection / keep-alive?", "Introduced in HTTP/1.1, it keeps the underlying TCP connection open across multiple requests/responses instead of opening a new one each time, reducing the overhead of repeated TCP handshakes."],
+    ["Cost of opening a new TCP connection per request?", "Each new connection requires a TCP handshake (and TLS handshake for HTTPS), adding round-trip latency and CPU overhead — expensive when repeated for every single request on a page with many assets."]
+  ]},
+  { section: "Data Transfer", items: [
+    ["What is multipart data and when is it used?", "multipart/form-data encoding splits a request body into multiple parts, each with its own headers — commonly used for file uploads combined with form fields in a single request."],
+    ["What is chunked transfer encoding?", "Transfer-Encoding: chunked lets the server send the response in a series of chunks without knowing the total content length upfront — useful for streaming responses or dynamically generated content."]
+  ]},
+  { section: "Security (SSL/TLS/HTTPS)", items: [
+    ["SSL vs TLS?", "TLS (Transport Layer Security) is the modern, more secure successor to SSL (Secure Sockets Layer). SSL is deprecated/insecure; \"SSL\" is still used colloquially but almost all secure connections today use TLS."],
+    ["How does the TLS handshake work at a high level?", "Client and server exchange supported cipher suites, the server presents its certificate (public key) for authentication, they perform a key exchange to agree on a shared symmetric session key, then all further communication is encrypted using that session key."],
+    ["Why is HTTPS important?", "It encrypts data in transit (confidentiality), verifies server identity via certificates (authentication), and ensures data hasn't been tampered with (integrity) — protections plain HTTP doesn't provide."]
+  ]}
+];
+
+// LocalStorage key for progress tracking
+const STORAGE_KEY = 'http_qa_mastered_keys';
+let masteredKeys = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+
+const containerEl = document.getElementById('questionsContainer');
+const categoryNavEl = document.getElementById('categoryNav');
+const countLabel = document.getElementById('countLabel');
+const searchInput = document.getElementById('searchInput');
+const toggleAllBtn = document.getElementById('toggleAllBtn');
+const progressBar = document.getElementById('progressBar');
+const progressPercent = document.getElementById('progressPercent');
+const resetProgressBtn = document.getElementById('resetProgressBtn');
+const emptyState = document.getElementById('emptyState');
+
+let totalQ = 0;
+let cardsList = [];
+let sectionElements = [];
+
+// Initialize and Render Q&A cards
+function init() {
+  let qCounter = 0;
+  
+  data.forEach((section, sIdx) => {
+    // Generate navigation item
+    const navLi = document.createElement('li');
+    navLi.className = 'nav-item';
+    const sectionId = `sec-${sIdx}`;
+    navLi.innerHTML = `<button type="button" onclick="scrollToSection('${sectionId}')">
+      <span>${section.section}</span>
+      <span class="sec-count">${section.items.length}</span>
+    </button>`;
+    categoryNavEl.appendChild(navLi);
+
+    // Generate section elements
+    const secWrapper = document.createElement('div');
+    secWrapper.className = 'section-group';
+    secWrapper.id = sectionId;
+    
+    const secTitle = document.createElement('div');
+    secTitle.className = 'section-title';
+    secTitle.innerHTML = section.section;
+    secWrapper.appendChild(secTitle);
+
+    section.items.forEach(([q, a], iIdx) => {
+      qCounter++;
+      totalQ++;
+      const uniqueKey = `${sIdx}-${iIdx}`; // Unique reference to save in localStorage
+
+      const card = document.createElement('div');
+      card.className = 'qcard';
+      card.dataset.key = uniqueKey;
+      card.dataset.section = section.section;
+      if (masteredKeys.has(uniqueKey)) {
+        card.classList.add('mastered');
+      }
+
+      const head = document.createElement('div');
+      head.className = 'qhead';
+      
+      const headContent = document.createElement('div');
+      headContent.className = 'qhead-content';
+      headContent.innerHTML = `<span class="qnum">Q${qCounter}</span><span class="qtext">${q}</span>`;
+      
+      const actionsWrapper = document.createElement('div');
+      actionsWrapper.className = 'actions-wrapper';
+
+      const masteredBadge = document.createElement('div');
+      masteredBadge.className = 'mastered-badge';
+      masteredBadge.title = 'Mark as Mastered';
+      masteredBadge.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+      </svg>`;
+      
+      // Stop expansion click when marking as mastered
+      masteredBadge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMastered(uniqueKey, card);
+      });
+
+      const chevron = document.createElement('div');
+      chevron.className = 'chevron';
+      chevron.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+      </svg>`;
+
+      actionsWrapper.appendChild(masteredBadge);
+      actionsWrapper.appendChild(chevron);
+      
+      head.appendChild(headContent);
+      head.appendChild(actionsWrapper);
+
+      head.addEventListener('click', () => {
+        card.classList.toggle('open');
+        updateToggleAllLabel();
+      });
+
+      const answer = document.createElement('div');
+      answer.className = 'answer';
+      const answerInner = document.createElement('div');
+      answerInner.className = 'answer-inner';
+      answerInner.innerHTML = a;
+      answer.appendChild(answerInner);
+
+      card.appendChild(head);
+      card.appendChild(answer);
+      secWrapper.appendChild(card);
+      
+      cardsList.push({
+        element: card,
+        qText: q.toLowerCase(),
+        aText: a.toLowerCase(),
+        key: uniqueKey,
+        originalQ: q,
+        originalA: a,
+        qTextElement: headContent.querySelector('.qtext'),
+        aTextElement: answerInner
+      });
+    });
+
+    containerEl.appendChild(secWrapper);
+    sectionElements.push({
+      element: secWrapper,
+      navElement: navLi,
+      itemsCount: section.items.length
+    });
+  });
+
+  updateStats();
+  updateProgress();
+}
+
+function scrollToSection(id) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+    // Add temporary highlight effect on nav
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navBtn = Array.from(document.querySelectorAll('.nav-item button')).find(btn => btn.getAttribute('onclick').includes(id));
+    if (navBtn) {
+      navBtn.parentElement.classList.add('active');
+    }
+  }
+}
+
+// Mastered / Progress System
+function toggleMastered(key, cardElement) {
+  if (masteredKeys.has(key)) {
+    masteredKeys.delete(key);
+    cardElement.classList.remove('mastered');
+  } else {
+    masteredKeys.add(key);
+    cardElement.classList.add('mastered');
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(masteredKeys)));
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = masteredKeys.size;
+  const percentage = Math.round((count / totalQ) * 100) || 0;
+  progressBar.style.width = `${percentage}%`;
+  progressPercent.textContent = `${percentage}%`;
+}
+
+resetProgressBtn.addEventListener('click', () => {
+  if (confirm('Are you sure you want to reset all practice progress?')) {
+    masteredKeys.clear();
+    localStorage.removeItem(STORAGE_KEY);
+    document.querySelectorAll('.qcard').forEach(c => c.classList.remove('mastered'));
+    updateProgress();
+  }
+});
+
+// Show/Hide All Answers
+function updateToggleAllLabel() {
+  const visibleCards = cardsList.filter(c => c.element.style.display !== 'none');
+  const openCount = visibleCards.filter(c => c.element.classList.contains('open')).length;
+  toggleAllBtn.textContent = (openCount > 0 && openCount === visibleCards.length) ? 'Hide All Answers' : 'Show All Answers';
+}
+
+toggleAllBtn.addEventListener('click', () => {
+  const visibleCards = cardsList.filter(c => c.element.style.display !== 'none');
+  const openCount = visibleCards.filter(c => c.element.classList.contains('open')).length;
+  const allOpen = openCount === visibleCards.length;
+  visibleCards.forEach(c => c.element.classList.toggle('open', !allOpen));
+  updateToggleAllLabel();
+});
+
+// Search & Filtering with Highlights
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  
+  if (query === '') {
+    // Reset all cards and sections
+    cardsList.forEach(card => {
+      card.element.style.display = 'block';
+      card.qTextElement.innerHTML = card.originalQ;
+      card.aTextElement.innerHTML = card.originalA;
+    });
+    sectionElements.forEach(sec => {
+      sec.element.style.display = 'block';
+      sec.navElement.style.display = 'block';
+    });
+    emptyState.style.display = 'none';
+    updateStats();
+    updateToggleAllLabel();
+    return;
+  }
+
+  let totalVisible = 0;
+
+  // Track visibility per section
+  const sectionVisibility = {};
+
+  cardsList.forEach(card => {
+    const sectionName = card.element.dataset.section;
+    if (!sectionVisibility[sectionName]) {
+      sectionVisibility[sectionName] = 0;
+    }
+
+    const matchQ = card.qText.includes(query);
+    const matchA = card.aText.includes(query);
+
+    if (matchQ || matchA) {
+      card.element.style.display = 'block';
+      sectionVisibility[sectionName]++;
+      totalVisible++;
+
+      // Highlight terms
+      card.qTextElement.innerHTML = highlightHTML(card.originalQ, query);
+      card.aTextElement.innerHTML = highlightHTML(card.originalA, query);
+    } else {
+      card.element.style.display = 'none';
+    }
+  });
+
+  // Toggle Section & Nav headers based on visible child cards
+  sectionElements.forEach(sec => {
+    const secName = sec.element.querySelector('.section-title').textContent;
+    const isVisible = sectionVisibility[secName] > 0;
+    sec.element.style.display = isVisible ? 'block' : 'none';
+    sec.navElement.style.display = isVisible ? 'block' : 'none';
+  });
+
+  // Empty state handling
+  emptyState.style.display = totalVisible === 0 ? 'block' : 'none';
+  updateStats(totalVisible);
+  updateToggleAllLabel();
+});
+
+function highlightHTML(text, query) {
+  const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+  // Avoid matching inside html tags
+  let result = '';
+  let inTag = false;
+  let buffer = '';
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === '<') {
+      if (buffer) {
+        result += buffer.replace(regex, '<mark class="highlight">$1</mark>');
+        buffer = '';
+      }
+      inTag = true;
+    }
+    if (inTag) {
+      result += char;
+      if (char === '>') {
+        inTag = false;
+      }
+    } else {
+      buffer += char;
+    }
+  }
+  if (buffer) {
+    result += buffer.replace(regex, '<mark class="highlight">$1</mark>');
+  }
+  return result;
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function updateStats(visibleCount) {
+  const count = visibleCount !== undefined ? visibleCount : totalQ;
+  countLabel.textContent = `${count} questions`;
+}
+
+// Bootstrap
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
